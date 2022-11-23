@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pegawai;
+use App\Http\Requests\PegawaiRequest;
 
 class PegawaiController extends Controller
 {
@@ -12,11 +13,17 @@ class PegawaiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $keyword = $request->keyword;
         $datas = Pegawai::all();
-
-        return view('pegawai.index', compact('datas'));
+        //Untuk mengetahui variabel error
+        // dd($datas);
+        $datas = Pegawai::where('nama', 'LIKE', '%'.$keyword.'%')
+            ->orwhere('gelar', 'LIKE', '%'.$keyword.'%')
+            ->orwhere('nip', 'LIKE', '%'.$keyword.'%')
+            ->get();
+        return view('pegawai.index', compact('datas', 'keyword'));
     }
 
     /**
@@ -36,7 +43,7 @@ class PegawaiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PegawaiRequest $request)
     {
         $model = new Pegawai;
         $model->nama=$request->nama;
@@ -45,7 +52,7 @@ class PegawaiController extends Controller
         $model->nip=$request->nip;
         $model->save();
 
-        return redirect('pegawai');
+        return redirect('pegawai')->with('success', 'Data berhasil disimpan');
     }
 
     /**
@@ -78,7 +85,7 @@ class PegawaiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PegawaiRequest $request, $id)
     {
         $model = Pegawai::find($id);
         $model->nama=$request->nama;
@@ -87,7 +94,7 @@ class PegawaiController extends Controller
         $model->nip=$request->nip;
         $model->save();
 
-        return redirect('pegawai');
+        return redirect('pegawai')->with('success', 'Data berhasil diperbarui');
     }
 
     /**

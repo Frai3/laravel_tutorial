@@ -2,7 +2,19 @@
 
 @section('content')
     <br />
+    @if(Session::has('success'))
+        <p class="alert alert-success">{{ Session::get('success') }}</p>
+    @endif
+
     <a class="btn btn-success" href="{{ url('pegawai/create') }}">Tambah</a>
+    <br /><br />
+
+    <form action="{{ url('pegawai') }}" method="GET">
+        <input type="text" name="keyword" value="{{ $keyword }}"/>
+        <button type="submit">Search</button>
+    </form>
+
+    <br />
     <table class="table table-bordered">
         <tr>
             <th>Nama</th>
