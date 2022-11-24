@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pegawai;
 use App\Http\Requests\PegawaiRequest;
+use Illuminate\Support\Facades\File;
 
 class PegawaiController extends Controller
 {
@@ -22,6 +23,8 @@ class PegawaiController extends Controller
         $datas = Pegawai::where('nama', 'LIKE', '%'.$keyword.'%')
             ->orwhere('gelar', 'LIKE', '%'.$keyword.'%')
             ->orwhere('nip', 'LIKE', '%'.$keyword.'%')
+            // ->paginate(5); //Menampilkan hanya 5 data di satu halaman
+            // $datas->withpath('pegawai');
             ->get();
         return view('pegawai.index', compact('datas', 'keyword'));
     }
@@ -50,6 +53,14 @@ class PegawaiController extends Controller
         $model->tanggal_lahir=$request->tanggal_lahir;
         $model->gelar=$request->gelar;
         $model->nip=$request->nip;
+        // $model->foto_profile=$request->foto_profile;
+
+        if($request->file('foto_profile')){
+            $file = $request->file('foto_profile');
+            $nama_file = time().str_replace(" ", "", $file->getClientOriginalName());
+            $file->move('foto', $nama_file);
+            $model->foto_profile = $nama_file;
+        }
         $model->save();
 
         return redirect('pegawai')->with('success', 'Data berhasil disimpan');
@@ -92,6 +103,16 @@ class PegawaiController extends Controller
         $model->tanggal_lahir=$request->tanggal_lahir;
         $model->gelar=$request->gelar;
         $model->nip=$request->nip;
+
+        if($request->file('foto_profile')){
+            $file = $request->file('foto_profile');
+            $nama_file = time().str_replace(" ", "", $file->getClientOriginalName());
+            $file->move('foto', $nama_file);
+
+            File::delete('foto/'.$model->foto_profile);
+            $model->foto_profile = $nama_file;
+        }
+
         $model->save();
 
         return redirect('pegawai')->with('success', 'Data berhasil diperbarui');
@@ -106,6 +127,7 @@ class PegawaiController extends Controller
     public function destroy($id)
     {
         $model = Pegawai::find($id);
+        File::delete('foto/'.$model->foto_profile);
         $model->delete();
         return redirect('pegawai');
     }

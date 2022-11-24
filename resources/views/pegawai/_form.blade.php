@@ -11,4 +11,11 @@ NIP : <input type="text" name="nip" value="{{ $model->nip }}"><br />
 @foreach($errors->get('nip') as $msg)
     <p class="text-danger">{{ $msg }}</p>
 @endforeach
+Foto Profile : <input type="file" name="foto_profile" value="{{ $model->foto_profile }}"><br />
+@foreach($errors->get('foto_profile') as $msg)
+    <p class="text-danger">{{ $msg }}</p>
+@endforeach
+@if(strlen($model->foto_profile)>0)
+    <img src="{{ asset('foto/'.$model->foto_profile) }}">
+@endif
 <button type="submit">SIMPAN</button>
